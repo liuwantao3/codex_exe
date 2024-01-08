@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codex - Your AI</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/github-markdown-css/2.2.1/github-markdown.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <nav>
+      <a href="#" id="logout_link">Logout</a>
+      <a href="#" id="profile_link">Profile</a>
+    </nav>
+    <div id="app">
+      <div id="login_container" style="display:none">
+        <h1>Log In Codex</h1>
+        <form id="login_form">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required>
+
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required>
+
+          <button type="submit">Log In</button>
+        </form>
+        <p>Don't have an account yet? <a href="#" id="signin_link">Sign up</a></p>
+      </div>
+
+      <div id="signin_container" style="display:none">
+        <h1>Sign In Codex</h1>
+        <form id="signin_form">
+          <label for="username">Username:</label>
+          <input type="text" id="signusername" name="username" required>
+
+          <label for="password">Password:</label>
+          <input type="password" id="signpassword" name="password" required>
+
+          <button type="submit">Sign In</button>
+        </form>
+        <p>Already have an account? <a href="#" id="login_link">Log in</a></p>
+      </div>
+
+      <div id="chat_container" style="display:none">
+        <div id="message_container"></div>
+
+        <form id="chat_form">
+          <textarea id="prompt_textarea" name="prompt" rows="1" cols="1" placeholder="Ask Codex..."></textarea>
+          <button type="submit"><img src="assets/send.svg" alt="send" /></button>
+        </form>
+      </div>
+    </div>
+
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="chat.js"></script>
+    <script type="module">
+
+
+      const signinLink = document.getElementById("signin_link");
+      const loginLink = document.getElementById("login_link");
+      const loginContainer = document.getElementById("login_container");
+      const signinContainer = document.getElementById("signin_container");
+      const chatContainer = document.getElementById("chat_container");
+
+      signinLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        loginContainer.style.display = "none";
+        signinContainer.style.display = "block";
+      });
+
+      loginLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        signinContainer.style.display = "none";
+        loginContainer.style.display = "block";
+      });
+      /*
+      // Listen for the beforeunload event
+      window.addEventListener('beforeunload', () => {
+      // Remove the JWT token from local storage
+        localStorage.removeItem('jwtToken');
+      })
+      window.addEventlist('')
+      */
+    </script>
+  </body>
+</html>
