@@ -11,8 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
-    <script type="module" crossorigin src="/codex_client/assets/index-e0075baf.js"></script>
-    <link rel="stylesheet" href="/codex_client/assets/index-8ad1aceb.css">
+
+    <script type="module" crossorigin src="/codex_exe/assets/index-f2e2a881.js"></script>
+    <link rel="stylesheet" href="/codex_exe/assets/index-0af35f56.css">
   </head>
   <body>
     <nav>
@@ -52,40 +53,14 @@
         <div id="message_container"></div>
 
         <form id="chat_form">
-          <textarea name="prompt" rows="1" cols="1" placeholder="Ask Codex..."></textarea>
-          <button type="submit"><img src="/codex_client/assets/send-246d4b43.svg" alt="send" /></button>
+          <textarea id="prompt_textarea" name="prompt" rows="1" cols="1" placeholder="Ask Codex..."></textarea>
+          <button type="submit"><img src="/codex_exe/assets/send-246d4b43.svg" alt="send" /></button>
         </form>
       </div>
     </div>
 
     
     
-    <script>
-      const signinLink = document.getElementById("signin_link");
-      const loginLink = document.getElementById("login_link");
-      const loginContainer = document.getElementById("login_container");
-      const signinContainer = document.getElementById("signin_container");
-      const chatContainer = document.getElementById("chat_container");
-
-      signinLink.addEventListener("click", (event) => {
-        event.preventDefault();
-        loginContainer.style.display = "none";
-        signinContainer.style.display = "block";
-      });
-
-      loginLink.addEventListener("click", (event) => {
-        event.preventDefault();
-        signinContainer.style.display = "none";
-        loginContainer.style.display = "block";
-      });
-      /*
-      // Listen for the beforeunload event
-      window.addEventListener('beforeunload', () => {
-      // Remove the JWT token from local storage
-        localStorage.removeItem('jwtToken');
-      })
-      window.addEventlist('')
-      */
-    </script>
+    
   </body>
 </html>
