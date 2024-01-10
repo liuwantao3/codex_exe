@@ -2,10 +2,14 @@ import MarkdownIt from 'markdown-it';
 import mdHighlight from 'markdown-it-highlightjs';
 import { io } from 'socket.io-client';
 import katex from 'katex';
-// import hljs from 'highlight.js';
-// import python from 'highlight.js/lib/languages/python.js';
-// import javascript from 'highlight.js/lib/languages/javascript.js';
-// import html from 'highlight.js/lib/languages/xml.js';
+import markdownItKatex from 'markdown-it-katex';
+import hljs from 'highlight.js/lib/core';
+import python from 'highlight.js/lib/languages/python.js';
+import javascript from 'highlight.js/lib/languages/javascript.js';
+import html from 'highlight.js/lib/languages/xml.js';
+import latex from 'highlight.js/lib/languages/latex.js';
+import markdownItTexmath from 'markdown-it-texmath';
+//import katex from 'markdown-it-katex'
 
 export var sourceCodes = [];
 let containerID = 0;
@@ -47,13 +51,18 @@ socket.on('image', (e) => imageHandler(e));
 
 export function renderMarkdown(content) {
 
-  // hljs.registerLanguage('python', python);
-  // hljs.registerLanguage('javascript', javascript);
-  // hljs.registerLanguage('js', javascript);
-  // hljs.registerLanguage('html', html);
+  hljs.registerLanguage('python', python);
+  hljs.registerLanguage('javascript', javascript);
+  hljs.registerLanguage('js', javascript);
+  hljs.registerLanguage('html', html);
+  //hljs.registerLanguage('latex', latex);
 
-  const markdown = MarkdownIt({ linkify: true, breaks: true }).use(mdHighlight);
-  //const markdown = MarkdownIt({ linkify: true, breaks: true });
+  //const markdown = MarkdownIt({ linkify: true, breaks: true }).use(mdHighlight,{hljs: hljs}).use(markdownItTexmath, {engine: katex, delimiters: ['dollars', 'beg_end'], katexOptions: {macros: {'\\RR': '\\mathbb{R}'}}});
+  const markdown = MarkdownIt({ linkify: true, breaks: true }).use(mdHighlight,{hljs: hljs});
+
+  //only render fenced code block, not working
+  //markdown.disable(['block']);
+  //markdown.enable(['fence']);
 
   const fence = markdown.renderer.rules.fence;
   markdown.renderer.rules.fence = (...args) => {
@@ -61,19 +70,22 @@ export function renderMarkdown(content) {
     const token = tokens[idx];
     const language = token.info.trim();
 
-    const rawCode = fence?.(...args);
+    
 
-    // Todo: Add latex support, not working yet
+    // Todo: Add latex support, worked 1/9/2024
     if (language === 'latex') {
 
-      return katex.renderToString(rawCode, {throwOnError: false});
+      //return katex.renderToString(token.content, {throwOnError: false});
+      return token.content
 
     }
 
+    const rawCode = fence?.(...args);
 
     if (language !== 'python' && language !== 'javascript' && language !== 'js' && language !== 'html') {
       return rawCode;
     }
+
 
     sourceCodes.push({'language':language, 'content': token.content});
 
@@ -91,15 +103,15 @@ export function renderMarkdown(content) {
     containerID += 1;
 
     return `<div style="position: relative";>
-              <div style="display: flex; flex-direction: column; width: 100%; background: #f0f0f0; border-radius: 4px; padding: 4px 8px; font-size: 18px;">
+              <div style="display: flex; flex-direction: column; width: 100%; background: #f0f0f0; border-radius: 0px; padding: 4px 8px; font-size: 18px;">
                 <div id="formatedCode${containerID}" style="overflow: auto; color: black; min-height: 100px;">${rawCode}</div>
                 <div style="display: none;">
                   <textarea id="rawCode${containerID}" style="overflow: auto; width: 100%; height: 100%; border: none; background: transparent; resize: none; outline: none; padding: 4px 8px; font-size: 18px; color: black;"></textarea>
                 </div>
               </div>
-              <div id="buttonContainer${containerID}" style="position: relative; top: 0; left: 0; right: 0; bottom: 0; cursor: pointer; border-radius: 4px; display: flex; justify-content: right; align-items: center;">
+              <div id="buttonContainer${containerID}" style="position: relative; top: 0; left: 0; right: 0; bottom: 0; cursor: pointer; border-radius: 0px; display: flex; justify-content: right; align-items: center;">
               </div>
-              <div id="runningResult${containerID}" style="position: relative; top: 0; left: 0; right: 0; bottom: 0; background: #f0f0f0; border-radius: 4px; font-size: 18px; display: flex; color: black">
+              <div id="runningResult${containerID}" style="position: relative; top: 0; left: 0; right: 0; bottom: 0; background: #f0f0f0; border-radius: 0px; font-size: 18px; display: flex; color: black">
               </div>
             </div>
             `;

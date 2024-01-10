@@ -21,6 +21,8 @@
     "markdown-it": "^14.0.0",
     "markdown-it-highlightjs": "^4.0.1",
     "markdown-it-katex": "^2.0.3",
+    "markdown-it-texmath": "^1.0.0",
+    "mathpix-markdown-it": "^1.2.24",
     "require.js": "^1.0.0",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2"

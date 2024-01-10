@@ -129,30 +129,34 @@ const handleSubmit = async (e) => {
         const data = await response.json();
         const parsedData = data.bot.trim(); // trims any trailing spaces/'\n' 
 
-        console.log(parsedData); // See the response from GPT
+        console.log("Raw Data:\n" + parsedData); // See the response from GPT
 
         /* covert to Markdown */
         const markdown = renderMarkdown(parsedData);
+
+        console.log("Markdown:\n" + markdown);
 
         messageDiv.innerHTML = markdown;
 
         registerButton();
 
         // Tried to render math in the middle of markdown, but it doesn't work
-        // Below code was working
+        // Below code working
 
-        // renderMathInElement(messageDiv, {
-        //     delimiters: [
-        //         {left: '$$', right: '$$', display: true},
-        //         {left: '$', right: '$', display: true},
-        //         {left: '\\(', right: '\\)', display: true},
-        //         {left: '\\[', right: '\\]', display: true}
-        //     ],
-        //     ignoredTags: [
-        //         'script', 'noscript', 'style', 'textarea', 'annotation', 'annotation-xml'
-        //     ],
-        //     throwOnError : false
-        //   });
+        renderMathInElement(messageDiv, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: true},
+                {left: '\\(', right: '\\)', display: true},
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\begin{equation}', right: '\\end{equation}', display: true},
+                {left: '\\begin{equation*}', right: '\\end{equation*}', display: true}
+            ],
+            ignoredTags: [
+                'script', 'noscript', 'style', 'textarea', 'annotation', 'annotation-xml'
+            ],
+            throwOnError : false
+          });
 
     } else {
         const err = await response.text()
@@ -188,15 +192,15 @@ messageContainer.addEventListener('click', function(event) {
         
         // All work around for highlight, can't add \n but space and some comments
         if (sourceCodes[Number(index) - 1].language === 'html') {
-            formatedNode.innerHTML = renderMarkdown("```html <!DOCTYPE html>\n" + sourceCodes[Number(index) - 1].content + "```");
+            formatedNode.innerHTML = renderMarkdown("```html <!DOCTYPE html>\n\n" + sourceCodes[Number(index) - 1].content + "```");
             //formatedNode.innerHTML = renderMarkdown(sourceCodes[Number(index) - 1].content);
 
         } else if (sourceCodes[Number(index) - 1].language === 'python') {
-            formatedNode.innerHTML = renderMarkdown("```python #Python code" + sourceCodes[Number(index) - 1].content + "```");
+            formatedNode.innerHTML = renderMarkdown("```python #Python code\n\n" + sourceCodes[Number(index) - 1].content + "```");
             //formatedNode.innerHTML = renderMarkdown(sourceCodes[Number(index) - 1].content);
             console.log("Python code is " + rawNode.value);
         }else if (sourceCodes[Number(index) - 1].language === 'javascript') {
-            formatedNode.innerHTML = renderMarkdown("```javascript //Node.js code" + sourceCodes[Number(index) - 1].content + "```");
+            formatedNode.innerHTML = renderMarkdown("```javascript //Node.js code\n\n" + sourceCodes[Number(index) - 1].content + "```");
             //formatedNode.innerHTML = renderMarkdown(sourceCodes[Number(index) - 1].content);
         }
 
