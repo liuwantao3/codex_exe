@@ -6,28 +6,37 @@ body {
   padding: 0;
   font-family: sans-serif;
   background: #343541;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  width: 100%;
+  height: 40px;
+  background: #afb0c780;
+  display: flex;
+  justify-content: space-apart;
+  align-items: right;
+  padding: 0 20px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  z-index: 1;
 }
 
 #app {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  flex: 1;
   background: #343541;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
-/*
-#app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-}
-*/
+
 #login_container {
   background-color: #f3f4f7;
   border-radius: 10px;
@@ -92,22 +101,57 @@ button[type="submit"]:hover {
   background-color: #388e3c;
 }
 
-#chat_container {
+#app_wrapper {
+  flex: 1;
+  width: 100%;
+  margin: 0 auto;
+
+  display: none;
+  flex-direction: row;
+  gap: 10px;
+}
+
+#chat_sidebar {
   flex: 1;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
-
-  display: none;
-
+  display: flex;
   flex-direction: column;
   gap: 10px;
+  background-color: #afb0c780;
+  border-radius: 5px;
+}
 
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+#chat_sidebar #chat_status{
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 0; /* Value representing the offset from the top of the viewport */
+  height: 90vh; /* You may set this to the height you want */
+  overflow-y: auto; /* Allow the sidebar to scroll independently if its content is long */
+  padding: 5px;
+  background-color: #40414F;
+  margin: 10px;
+  color: #dcdcdc;
+}
 
-  padding-bottom: 20px;
-  scroll-behavior: smooth;
+#chat_container {
+  flex: 5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-item .session-link {
+  color:#dcdcdc
+}
+
+.code-snippet-item .code-snippet {
+  color: #dcdcdc;
+  padding: 5px;
+  border-radius: 5px;
+  margin: 5px;
 }
 
 #message_container {
@@ -122,7 +166,6 @@ button[type="submit"]:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 
-  padding-bottom: 20px;
   scroll-behavior: smooth;
 }
 
@@ -136,8 +179,11 @@ button[type="submit"]:hover {
   padding: 15px;
 }
 
-.ai {
+.ai .chat {
   background: #40414F;
+  border-radius: 5px 5px 0 5px;
+  padding: 5px;
+  padding-right: 10px;
 }
 
 .chat {
@@ -149,6 +195,7 @@ button[type="submit"]:hover {
   flex-direction: row;
   align-items: flex-start;
   gap: 10px;
+  padding: 5px;
 }
 
 .profile {
@@ -263,6 +310,13 @@ button {
     border: 1px solid #333;
   }
 
+  span#logo{
+    display: block;
+    font-size: 2em;
+    font-weight: bold;
+    color: #383838;
+  }
+
   /* Style for the logout link */
   #logout_link {
     float: right;
@@ -275,6 +329,19 @@ button {
     float: right;
     background-color: #00bfff;
     color: #fff;
+  }
+
+  /* Style for the isolated code block */
+  .code-block {
+    background-color: #f3f4f7;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+      0 3px 6px rgba(0, 0, 0, 0.23);
+    margin-left: 18px;
+    margin-right: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 
   * {

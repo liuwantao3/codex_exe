@@ -9,18 +9,23 @@ import javascript from 'highlight.js/lib/languages/javascript.js';
 import html from 'highlight.js/lib/languages/xml.js';
 import latex from 'highlight.js/lib/languages/latex.js';
 import markdownItTexmath from 'markdown-it-texmath';
+import { getUser } from './utility.js';
+import { on } from 'codemirror';
 //import katex from 'markdown-it-katex'
 
 export var sourceCodes = [];
 let containerID = 0;
 let currentStart = 0;
 
+//add a global variable to store session id. ToDo: need to find a better way to store session id
+export var current_session_id = '';
+
 var currentIndex = 0;
 
 //setup socket.io for Juypter notebook
 
-//const socket = io('ws://localhost:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
-const socket = io('ws://20.239.59.151:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
+const socket = io('wss://codexserver.eastasia.cloudapp.azure.com:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
+//const socket = io('ws://20.239.59.151:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
 console.log("socket is ", socket);
 
 socket.on('connect', () => {
@@ -86,8 +91,8 @@ export function renderMarkdown(content) {
       return rawCode;
     }
 
-
-    sourceCodes.push({'language':language, 'content': token.content});
+    let cell_id = crypto.randomUUID();
+    sourceCodes.push({'language':language, 'content': token.content, 'cell_id': cell_id});
 
     // ToDo: Tried to add highlight.js support in the middle of Markdown fence handling, but it seems not working. Still use mdHighlight plugin
     // Need to study how to add specific language support for mdHighlight plugin
@@ -165,17 +170,21 @@ export async function runCode(index) {
 
       return;
     }
-    
+
     // Support Jupyter notebook
-    //const response = await fetch("http://127.0.0.1:8000/execute", {
-    const response = await fetch("http://20.239.59.151:8000/execute", {
+    //const response = await fetch("https://127.0.0.1:8000/execute", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/execute", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         code: sourceCodes[index].content,
-        language: sourceCodes[index].language
+        language: sourceCodes[index].language,
+        session_id: current_session_id,
+        user_id: getUser(),
+        description: "This is a test description",
+        cell_id: sourceCodes[index].cell_id
       })
     });
 
@@ -185,14 +194,19 @@ export async function runCode(index) {
 
     document.getElementById(`runningResult${index+1}`).innerHTML = "Running...";
 
-    // const data = await response.text(); // parse the JSON from the response
+    const data = await response.json(); // parse the JSON from the response
 
-    // console.log("Code Running Result: " + data);
-    // if(JSON.parse(data)['output'] !== undefined){
-    //   document.getElementById(`runningResult${index+1}`).innerHTML = JSON.parse(data)['output'];
-    // } else {
-    //   document.getElementById(`runningResult${index+1}`).innerHTML = JSON.parse(data)['error'];
-    // }
+    console.log("response: " + JSON.stringify(data));
+
+    if(data['message'] !== undefined){
+      document.getElementById(`runningResult${index+1}`).innerHTML += data['message'];
+      if(data['session_id'] !== undefined && data['session_id'] !== null){
+        current_session_id = data['session_id'];
+        console.log("current_session_id: " + current_session_id);
+        console.log("cell_id: " + data['cell_id']);
+        document.getElementById('session_id').innerHTML = current_session_id;
+      }
+    }
 
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
@@ -204,11 +218,12 @@ export function registerButton(){
   // Attach the event listener only once to the parent container
 
   for(let i=currentStart + 1; i<=containerID; i++) {
+
     console.log("buttonContainer" + i);
-    // Create a new button element
+
+    // Create a new button element for Run Code
     let button = document.createElement('button');
             
-    // Set button text or any attributes if needed
     button.textContent = 'Run Code';
     button.style.fontSize = '16px';
     button.style.padding = '8px 16px';
@@ -220,15 +235,13 @@ export function registerButton(){
     button.style.marginRight = '2px';
     button.style.marginLeft = '2px';
     
-
     document.getElementById(`buttonContainer${i}`).appendChild(button);
 
-    // Create a new button element
+    // Create a new button element for Edit Code
     button = document.createElement('button');
             
-    // Set button text or any attributes if needed
-    button.textContent = 'Save Code';
-    button.id = `saveCode${i}`;
+    button.textContent = 'Edit Done';
+    button.id = `editDone${i}`;
     button.style.fontSize = '16px';
     button.style.padding = '8px 16px';
     button.style.borderRadius = '4px';
@@ -237,6 +250,22 @@ export function registerButton(){
     button.style.background = '#4CAF50';
     button.style.color = 'white';
     button.style.display = 'none';
+    button.style.marginRight = '2px';
+    button.style.marginLeft = '2px';
+
+    document.getElementById(`buttonContainer${i}`).appendChild(button);
+
+    // Create a new button element for Save Code
+    button = document.createElement('button');
+            
+    button.textContent = 'Save Code';
+    button.style.fontSize = '16px';
+    button.style.padding = '8px 16px';
+    button.style.borderRadius = '4px';
+    button.style.border = 'none';
+    button.style.cursor = 'pointer';
+    button.style.background = '#4CAF50';
+    button.style.color = 'white';
     button.style.marginRight = '2px';
     button.style.marginLeft = '2px';
 
@@ -348,4 +377,256 @@ function loadScriptsInOrder(node, scripts, callback) {
   }).catch(error => {
       console.log('A script failed to load:', error);
   });
+}
+
+export async function save_cell(index, session_id, user_id, description) {
+
+  //const response = await fetch("https://127.0.0.1:8000/sessions", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'save_cell',
+        code: sourceCodes[index].content,
+        language: sourceCodes[index].language,
+        session_id: session_id,
+        user_id: getUser(),
+        description: "This is a test description",
+        cell_id: sourceCodes[index].cell_id
+      })
+    });
+
+  if (!response.ok) {
+      throw new Error('Network response not ok');
+  }
+
+  const data = await response.json(); // parse the JSON from the response
+
+  console.log("response: " + JSON.stringify(data));
+
+  if(data['message'] !== undefined){
+    document.getElementById(`runningResult${index+1}`).innerHTML += data['message'];
+    if(data['session_id'] !== undefined && data['session_id'] !== null){
+      current_session_id = data['session_id'];
+      console.log("current_session_id: " + current_session_id);
+      console.log("cell_id: " + data['cell_id']);
+      document.getElementById('session_id').innerHTML = current_session_id;
+    }
+  }
+}
+
+export async function retrieve_sessions(user_id) {
+
+  //const response = await fetch("https://127.0.0.1:8000/sessions", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'retrieve_sessions',
+        code: '',
+        language: '',
+        session_id: '',
+        user_id: getUser(),
+        description: '',
+        cell_id: ''
+      })
+    });
+
+  if (!response.ok) {
+      throw new Error('Network response not ok');
+  }
+
+  const data = await response.json(); // parse the JSON from the response
+
+  console.log("response: " + JSON.stringify(data));
+
+  if(data['message'] !== undefined){
+
+    var ul = document.createElement('ul');
+    data.session_ids.forEach(function(item) {
+        var li = document.createElement('li');
+        li.innerHTML = createSessionItem(item);
+
+        li.addEventListener('click', function(event) {
+          onSessionClick(event, item);
+        });
+        li.style.cursor = 'pointer';
+        ul.appendChild(li);
+
+        var deleteButton = li.querySelector(`#delete${item}`);
+        deleteButton.addEventListener('click', function(event) {
+          event.stopPropagation();
+          onSessionDeleteClick(event, item);
+        });
+    });
+
+    document.getElementById("session_container").appendChild(ul);
+    console.log(data['message']);
+  }
+}
+
+// Define a button to help on server code testing
+const logoutLink = document.getElementById('test_link');
+logoutLink.addEventListener('click', function(event) {
+  event.preventDefault();
+  console.log('Testing');
+  retrieve_sessions(getUser());
+});
+
+function createSessionItem(session_id) {
+  return `<div class="session-item">
+            <a href="#" class="session-link">
+              <span class="session-id">${session_id}</span>
+            </a>
+            <span id="delete${session_id}">&times;</span>
+            <div id=${session_id}></div>
+          </div>`;
+}
+
+function createCodeSnippetItem(code) {
+  return `<div class="code-snippet-item">
+            <a href="#" class="code-snippet-link">
+              <span class="code-snippet">${code}</span>
+            </a>
+            <span id="delete${code}">&times;</span>
+          </div>`;
+}
+
+async function onSessionClick(event, session_id) {
+  event.preventDefault();
+  console.log(session_id + 'Clicked');
+
+  //const response = await fetch("https://127.0.0.1:8000/sessions", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'retrieve_code',
+        code: '',
+        language: '',
+        session_id: session_id,
+        user_id: getUser(),
+        description: '',
+        cell_id: ''
+      })
+    });
+
+  if (!response.ok) {
+      throw new Error('Network response not ok');
+  }
+
+  current_session_id = session_id;
+  document.getElementById('session_id').innerHTML = current_session_id;
+
+  const data = await response.json(); // parse the JSON from the response
+
+  console.log("response: " + JSON.stringify(data));
+
+  if(data['message'] !== undefined){
+
+    var ul = document.createElement('ul');
+    if(data.code === undefined || data.code === null) {
+      console.log("No code snippet found");
+      return;
+    }
+
+    data.code.forEach(function(item) {
+        var li = document.createElement('li');
+        li.innerHTML = createCodeSnippetItem(item.cell_id);
+        li.addEventListener('click', function(event) {
+          event.stopPropagation();
+          onCodeClick(event, item);
+        });
+        li.style.cursor = 'pointer';
+        ul.appendChild(li);
+
+        var deleteButton = li.querySelector(`#delete${item.cell_id}`);
+        deleteButton.addEventListener('click', function(event) {
+          event.stopPropagation();
+          onCodeDeleteClick(event, item.cell_id);
+        });
+
+    });
+
+    document.getElementById(session_id).appendChild(ul);
+    console.log(data['message']);
+  }
+
+}
+
+function onCodeClick(event, code) {
+  event.preventDefault();
+  console.log(code.cell_id + 'Clicked');
+  
+  let msgContainer = document.querySelector('#message_container');
+  msgContainer.innerHTML += createCodeblock(code.language, code.code);
+}
+
+function createCodeblock(language, code) {
+  let markdown = renderMarkdown(`\`\`\`${language}\n${code}\`\`\``); 
+  return `<div class="code-block">
+              <span>${markdown}</span>
+          </div>`;
+}
+
+async function onSessionDeleteClick(event, session_id) {
+  event.preventDefault();
+  console.log(session_id + 'Deleted');
+
+  //const response = await fetch("https://127.0.0.1:8000/sessions", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'delete_session',
+        code: '',
+        language: '',
+        session_id: session_id,
+        user_id: getUser(),
+        description: '',
+        cell_id: ''
+      })
+    });
+
+  if (!response.ok) {
+      throw new Error('Network response not ok');
+  }
+
+   event.target.parentNode.remove();
+}
+
+async function onCodeDeleteClick(event, cell_id) {
+  event.preventDefault();
+  console.log(cell_id + 'Deleted');
+
+  //const response = await fetch("https://127.0.0.1:8000/sessions", {
+    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'delete_cell',
+        code: '',
+        language: '',
+        session_id: current_session_id,
+        user_id: getUser(),
+        description: '',
+        cell_id: cell_id
+      })
+    });
+
+  if (!response.ok) {
+      throw new Error('Network response not ok');
+  }
+
+   event.target.parentNode.remove();
 }

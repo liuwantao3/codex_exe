@@ -1,4 +1,4 @@
-import { Buffer } from "buffer";
+import { getUser } from "./utility.js";
 
 const loginForm = document.querySelector('#login_form');
 const signinForm = document.querySelector('#signin_form');
@@ -7,7 +7,7 @@ async function login(username, password) {
   try {
       //const response = await fetch('https://codex-s45z.onrender.com/auth', {
       const response = await fetch('https://openaiserverlwt.azurewebsites.net/auth', {
-      //const response = await fetch('http://localhost:5000/auth', {
+      //const response = await fetch('https://localhost:5000/auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ async function signin(username, password) {
     try {
       //const response = await fetch('https://codex-s45z.onrender.com/users', {
       const response = await fetch('https://openaiserverlwt.azurewebsites.net/users', {
-      //const response = await fetch('http://localhost:5000/users', {
+      //const response = await fetch('https://localhost:5000/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -57,19 +57,7 @@ async function signin(username, password) {
     }
 }
 
-function getUser() {
-    console.log('getUser called');
-   
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      return null;
-    }
-  
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString('utf8'));
 
-    console.log(payload);
-    return payload.username;
-}
   
 function logout() {
     localStorage.removeItem('jwtToken');
@@ -92,7 +80,7 @@ async function handleLogin(event) {
   passwordInput.value = '';
 
   const loggedIn = await login(username, password);
-  
+
   if (loggedIn) {
     // Hide login container
     const loginContainer = document.getElementById("login_container");
@@ -103,8 +91,8 @@ async function handleLogin(event) {
     signinContainer.style.display = "none";
 
     // Show chat container
-    const chatContainer = document.getElementById("chat_container");
-    chatContainer.style.display = "block";
+    const appWrapper = document.getElementById("app_wrapper");
+    appWrapper.style.display = "flex";
   } else {
     alert('Invalid username or password');
   }
@@ -137,8 +125,8 @@ async function handleSignin(event) {
     signinContainer.style.display = "none";
 
     // Show chat container
-    const chatContainer = document.getElementById("chat_container");
-    chatContainer.style.display = "block";
+    const appWrapper = document.getElementById("app_wrapper");
+    appWrapper.style.display = "flex";
   } else {
     alert('Invalid username or password');
   }
@@ -159,8 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const signinContainer = document.getElementById("signin_container");
     signinContainer.style.display = "none";
 
-    const chatContainer = document.getElementById('chat_container');
-    chatContainer.style.display = 'block';
+    const appWrapper = document.getElementById('app_wrapper');
+    appWrapper.style.display = 'flex';
   }
 })
 
@@ -183,5 +171,3 @@ profileLink.addEventListener('click', function(event) {
   // Your profile code here
   console.log("Profile clicked!");
 });
-
-

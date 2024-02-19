@@ -1,6 +1,6 @@
 import bot from './assets/bot.svg'
 import user from './assets/user.svg'
-import { renderMarkdown, registerButton, runCode, sourceCodes } from './markdown';
+import { renderMarkdown, registerButton, runCode, sourceCodes, save_cell, current_session_id } from './markdown';
 import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.mjs";
 
 import _CodeMirror from 'codemirror/lib/codemirror.js';
@@ -18,7 +18,7 @@ const chatContainer = document.querySelector('#chat_container');
 const chatForm = document.querySelector('#chat_form');
 const messageContainer = document.querySelector('#message_container');
 
-let loadInterval
+let loadInterval;
 
 function loader(element) {
     element.textContent = ''
@@ -102,7 +102,7 @@ const handleSubmit = async (e) => {
 
     const token = localStorage.getItem('jwtToken');
     const response = await fetch("https://openaiserverlwt.azurewebsites.net",{
-    //const response = await fetch('http://localhost:5000', {
+    //const response = await fetch('https://localhost:5000', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -120,8 +120,8 @@ const handleSubmit = async (e) => {
       const loginContainer = document.getElementById("login_container");
       loginContainer.style.display = "block";
 
-      const chatContainer = document.getElementById('chat_container');
-      chatContainer.style.display = 'none';
+    //   const chatContainer = document.getElementById('chat_container');
+    //   chatContainer.style.display = 'none';
 
       messageContainer.innerHTML = ''; //clean the previous chat contents and token
       localStorage.removeItem('jwtToken');
@@ -158,6 +158,8 @@ const handleSubmit = async (e) => {
             throwOnError : false
           });
 
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+
     } else {
         const err = await response.text()
 
@@ -183,7 +185,7 @@ messageContainer.addEventListener('click', function(event) {
     if (event.target.textContent === 'Run Code') {
         runCode(Number(index) - 1);
     }
-    else if (event.target.textContent === 'Save Code') {
+    else if (event.target.textContent ==='Edit Done') {
         
         event.target.style.display = 'none';
         const formatedNode = document.getElementById('formatedCode' + index);
@@ -209,6 +211,11 @@ messageContainer.addEventListener('click', function(event) {
         formatedNode.style.height = `${parseInt(rawNode.parentNode.style.height) - 50}px`;
         rawNode.parentNode.querySelector('.CodeMirror').remove();
         rawNode.parentNode.style.display = 'none';
+    }
+    else if (event.target.textContent ==='Save Code') {
+        // Send save code command to server
+        console.log("Save code clicked. Session id is " + current_session_id);
+        save_cell(Number(index) - 1, current_session_id,'','');
     }
   }
   else if (event.target.tagName.toLowerCase() === 'code') {
@@ -256,6 +263,9 @@ messageContainer.addEventListener('click', function(event) {
           sourceCodes[Number(index) - 1].content = htmlEditor.getValue();
           rawNode.value = htmlEditor.getValue();
           console.log("index is " + index);
+
+          //Todo: adjust the height of the editor
+
         };
     }
 
@@ -269,7 +279,7 @@ messageContainer.addEventListener('click', function(event) {
     rawNode.parentNode.click();
 
     
-    const saveButton = document.getElementById(`saveCode${index}`);
+    const saveButton = document.getElementById(`editDone${index}`);
 
     saveButton.style.display = 'block';
     
@@ -281,7 +291,7 @@ messageContainer.addEventListener('click', function(event) {
     const index = id.replace('formatedCode', '');
     const formatedNode = document.getElementById(id);
     const rawNode = document.getElementById("rawCode" + index);
-    const saveButton = document.getElementById(`saveCode${index}`);
+    const saveButton = document.getElementById(`editDone${index}`);
 
     saveButton.style.display = 'block';
     
