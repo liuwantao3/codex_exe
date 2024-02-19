@@ -12,13 +12,17 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
 
-    <script type="module" crossorigin src="/codex_exe/assets/index-47c28820.js"></script>
-    <link rel="stylesheet" href="/codex_exe/assets/index-0af35f56.css">
+    <script type="module" crossorigin src="/codex_exe/assets/index-a2db88d0.js"></script>
+    <link rel="stylesheet" href="/codex_exe/assets/index-8e95a4d6.css">
   </head>
   <body>
     <nav>
-      <a href="#" id="logout_link">Logout</a>
-      <a href="#" id="profile_link">Profile</a>
+      <span id="logo">Codex</span>
+      <span style="flex:1">
+        <a href="#" id="logout_link">Logout</a>
+        <a href="#" id="profile_link">Profile</a>
+        <a href="#" id="test_link">Test</a>
+      </span>
     </nav>
     <div id="app">
       <div id="login_container" style="display:none">
@@ -49,13 +53,25 @@
         <p>Already have an account? <a href="#" id="login_link">Log in</a></p>
       </div>
 
-      <div id="chat_container" style="display:none">
-        <div id="message_container"></div>
+      <div id="app_wrapper" style="display:none">
+        <div id="chat_sidebar">
+          <div id="chat_status">
+            <h3>Session Explore</h3>
+            <div id="session_container"></div>
+          </div>
+          <div id="session" style="position: sticky;">
+            <span style="margin: 10px">session_id: </span>
+            <span id="session_id"></span>
+          </div>
+        </div>
+        <div id ="chat_container">
+          <div id="message_container"></div>
 
-        <form id="chat_form">
-          <textarea id="prompt_textarea" name="prompt" rows="1" cols="1" placeholder="Ask Codex..."></textarea>
-          <button type="submit"><img src="/codex_exe/assets/send-246d4b43.svg" alt="send" /></button>
-        </form>
+          <form id="chat_form">
+            <textarea id="prompt_textarea" name="prompt" rows="1" cols="1" placeholder="Ask Codex..."></textarea>
+            <button type="submit"><img src="/codex_exe/assets/send-246d4b43.svg" alt="send" /></button>
+          </form>
+        </div>
       </div>
     </div>
 
