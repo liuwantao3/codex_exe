@@ -24,7 +24,7 @@ var currentIndex = 0;
 
 //setup socket.io for Juypter notebook
 
-const socket = io('wss://codexserver.eastasia.cloudapp.azure.com:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
+const socket = io('wss://fqserver.eastus.cloudapp.azure.com:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
 //const socket = io('ws://20.239.59.151:8000/ws', { transports: ['websocket'], path: '/ws/socket.io' });
 console.log("socket is ", socket);
 
@@ -173,7 +173,7 @@ export async function runCode(index) {
 
     // Support Jupyter notebook
     //const response = await fetch("https://127.0.0.1:8000/execute", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/execute", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/execute", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -382,7 +382,7 @@ function loadScriptsInOrder(node, scripts, callback) {
 export async function save_cell(index, session_id, user_id, description) {
 
   //const response = await fetch("https://127.0.0.1:8000/sessions", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/sessions", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -420,7 +420,7 @@ export async function save_cell(index, session_id, user_id, description) {
 export async function retrieve_sessions(user_id) {
 
   //const response = await fetch("https://127.0.0.1:8000/sessions", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/sessions", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -501,7 +501,7 @@ async function onSessionClick(event, session_id) {
   console.log(session_id + 'Clicked');
 
   //const response = await fetch("https://127.0.0.1:8000/sessions", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/sessions", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -580,7 +580,7 @@ async function onSessionDeleteClick(event, session_id) {
   console.log(session_id + 'Deleted');
 
   //const response = await fetch("https://127.0.0.1:8000/sessions", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/sessions", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -608,7 +608,7 @@ async function onCodeDeleteClick(event, cell_id) {
   console.log(cell_id + 'Deleted');
 
   //const response = await fetch("https://127.0.0.1:8000/sessions", {
-    const response = await fetch("https://codexserver.eastasia.cloudapp.azure.com:8000/sessions", {
+    const response = await fetch("https://fqserver.eastus.cloudapp.azure.com:8000/sessions", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
